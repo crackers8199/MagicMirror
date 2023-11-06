@@ -24,6 +24,8 @@ Module.register("clock", {
 		dateFormat: "dddd, LL",
 		sendNotifications: false,
 
+		dateTextLabel: false,
+
 		/* specific to the analog clock */
 		analogSize: "200px",
 		analogFace: "simple", // options: 'none', 'simple', 'face-###' (where ### is 001 to 012 inclusive)
@@ -149,6 +151,10 @@ Module.register("clock", {
 
 		if (this.config.showDate) {
 			dateWrapper.innerHTML = now.format(this.config.dateFormat);
+			digitalWrapper.appendChild(dateWrapper);
+		}
+		else if(this.config.dateTextLabel !== false) {
+			dateWrapper.innerHTML = this.config.dateTextLabel + ' | ' + now.format('ddd');
 			digitalWrapper.appendChild(dateWrapper);
 		}
 

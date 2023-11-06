@@ -228,6 +228,8 @@ Module.register("calendar", {
 		let lastSeenDate = "";
 
 		events.forEach((event, index) => {
+			//console.log(event); //.calendarNameForUrl(event.url));
+			if(this.calendarNameForUrl(event.url) == 'dinner') { return; }
 			const dateAsString = moment(event.startDate, "x").format(this.config.dateFormat);
 			if (this.config.timeFormat === "dateheaders") {
 				if (lastSeenDate !== dateAsString) {
@@ -258,10 +260,12 @@ Module.register("calendar", {
 
 			const eventWrapper = document.createElement("tr");
 
+			// eventWrapper.style.cssText = `color:${this.colorForUrl(event.url, false)}`;
 			if (this.config.coloredText) {
 				eventWrapper.style.cssText = `color:${this.colorForUrl(event.url, false)}`;
 			}
 
+			// eventWrapper.style.backgroundColor = this.colorForUrl(event.url, true);
 			if (this.config.coloredBackground) {
 				eventWrapper.style.backgroundColor = this.colorForUrl(event.url, true);
 			}
@@ -280,6 +284,7 @@ Module.register("calendar", {
 			const symbolWrapper = document.createElement("td");
 
 			if (this.config.displaySymbol) {
+				symbolWrapper.style.cssText = `color:${this.colorForUrl(event.url, true)}`;
 				if (this.config.coloredSymbol) {
 					symbolWrapper.style.cssText = `color:${this.colorForUrl(event.url, false)}`;
 				}
@@ -306,6 +311,7 @@ Module.register("calendar", {
 			const titleWrapper = document.createElement("td");
 			let repeatingCountTitle = "";
 
+			titleWrapper.style.cssText = `color:${this.colorForUrl(event.url, true)}`;
 			if (this.config.displayRepeatingCountTitle && event.firstYear !== undefined) {
 				repeatingCountTitle = this.countTitleForUrl(event.url);
 
@@ -337,7 +343,7 @@ Module.register("calendar", {
 				}
 			}
 
-			const transformedTitle = CalendarUtils.titleTransform(event.title, this.config.titleReplace);
+			const transformedTitle = event.title; //CalendarUtils.titleTransform(event.title, this.config.titleReplace);
 			titleWrapper.innerHTML = CalendarUtils.shorten(transformedTitle, this.config.maxTitleLength, this.config.wrapEvents, this.config.maxTitleLines) + repeatingCountTitle;
 
 			const titleClass = this.titleClassForUrl(event.url);
@@ -464,6 +470,7 @@ Module.register("calendar", {
 					}
 				}
 				timeWrapper.className = `time light ${this.timeClassForUrl(event.url)}`;
+				timeWrapper.style.cssText = `color:${this.colorForUrl(event.url, true)}`;
 				eventWrapper.appendChild(timeWrapper);
 			}
 
@@ -501,6 +508,8 @@ Module.register("calendar", {
 						locationRow.style.borderColor = this.colorForUrl(event.url, false);
 					}
 
+					locationRow.style.cssText = `color:${this.colorForUrl(event.url, true)}`;
+					
 					const descCell = document.createElement("td");
 					descCell.className = "location";
 					descCell.colSpan = "2";
@@ -559,6 +568,9 @@ Module.register("calendar", {
 			let maxPastDaysCompare = now - this.maximumPastDaysForUrl(calendarUrl) * ONE_DAY;
 			for (const e in calendar) {
 				const event = JSON.parse(JSON.stringify(calendar[e])); // clone object
+				if(event.title == 'hucklebucks trivia') {
+					//console.log(event);
+				}
 
 				if (this.config.hidePrivate && event.class === "PRIVATE") {
 					// do not add the current event, skip it
@@ -844,10 +856,14 @@ Module.register("calendar", {
 	 */
 	broadcastEvents: function () {
 		const eventList = this.createEventList(false);
+		//console.log(eventList);
+
 		for (const event of eventList) {
 			event.symbol = this.symbolsForEvent(event);
 			event.calendarName = this.calendarNameForUrl(event.url);
 			event.color = this.colorForUrl(event.url, false);
+			event.bgColor = this.colorForUrl(event.url, true);
+			event.hideCalendarName = this.getCalendarProperty(event.url, "hideName");
 			delete event.url;
 		}
 
